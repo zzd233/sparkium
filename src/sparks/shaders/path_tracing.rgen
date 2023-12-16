@@ -86,8 +86,19 @@ vec3 SampleRay(vec3 origin, vec3 direction) {
         radiance += throughput * material.emission * material.emission_strength;
         break;
       } else if (material.material_type == MATERIAL_TYPE_SPECULAR) {
-        direction -= 2.0f * hit_record.normal;
+        direction -= 2.0f * dot(hit_record.normal, direction) * hit_record.normal;
         origin = hit_record.position;
+    /*  } else if (material.material_type == MATERIAL_TYPE_LAMBERTIAN) {
+        float a = RandomFloat() * PI;
+        float b = RandomFloat() * PI * 2;
+        vec3 dir = vec3(sin(b) * cos(a), cos(b) * cos(a), sin(a));
+        if (dot(dir, hit_record.normal) < 0.0f)
+            dir *= -1;
+        throughput *= dot(dir, hit_record.normal) * material.albedo_color * 
+                      vec3(texture(texture_samplers[material.albedo_texture_id],
+                                   hit_record.tex_coord));
+        origin = hit_record.position;
+        direction = dir;*/
       } else {
         throughput *= material.albedo_color *
                       vec3(texture(texture_samplers[material.albedo_texture_id],
