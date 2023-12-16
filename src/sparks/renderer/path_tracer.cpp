@@ -30,10 +30,10 @@ glm::vec3 PathTracer::SampleRay(glm::vec3 origin,
       if (material.material_type == MATERIAL_TYPE_EMISSION) {
         radiance += throughput * material.emission * material.emission_strength;
         break;
-      } else if (material.material_type == MATERIAL_TYPE_SPECULAR) {
+/*      } else if (material.material_type == MATERIAL_TYPE_SPECULAR) {
         hit_record.normal = normalize(hit_record.normal);
-        direction -= 2.f * hit_record.normal;
-        origin = hit_record.position;
+        direction -= 2.f * glm::dot(direction, hit_record.normal) * hit_record.normal;
+        origin = hit_record.position;*/
       } else {
         throughput *=
             material.albedo_color *
