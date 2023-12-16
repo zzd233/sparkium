@@ -18,15 +18,22 @@ glm::vec3 PathTracer::SampleRay(glm::vec3 origin,
   glm::vec3 radiance{0.0f};
   HitRecord hit_record;
   const int max_bounce = render_settings_->num_bounces;
-  std::mt19937 rd(sample ^ x ^ y);
+  std::mt19937 rd(sample ^ x ^ y ^ rand());
   for (int i = 0; i < max_bounce; i++) {
+    direction = glm::normalize(direction);
     auto t = scene_->TraceRay(origin, direction, 1e-3f, 1e4f, &hit_record);
     if (t > 0.0f) {
       auto &material =
           scene_->GetEntity(hit_record.hit_entity_id).GetMaterial();
+      if (glm::dot(direction, hit_record.normal) > 0.0f)
+        hit_record.normal = -hit_record.normal;
       if (material.material_type == MATERIAL_TYPE_EMISSION) {
         radiance += throughput * material.emission * material.emission_strength;
         break;
+      } else if (material.material_type == MATERIAL_TYPE_SPECULAR) {
+        hit_record.normal = normalize(hit_record.normal);
+        direction -= 2.f * hit_record.normal;
+        origin = hit_record.position;
       } else {
         throughput *=
             material.albedo_color *
