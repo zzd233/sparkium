@@ -517,6 +517,8 @@ void App::UpdateImGui() {
           ImGui::SliderFloat("Emission Strength", &material.emission_strength,
                              0.0f, 1e5f, "%.3f", ImGuiSliderFlags_Logarithmic);
       reset_accumulation_ |=
+          ImGui::SliderFloat("Refraction Ratio", &material.refraction_ratio, 1.0f, 3.0f, "%.2f"); 
+      reset_accumulation_ |=
           ImGui::SliderFloat("Alpha", &material.alpha, 0.0f, 1.0f, "%.3f");
     }
 
