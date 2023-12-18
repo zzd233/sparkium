@@ -69,7 +69,7 @@ class Renderer {
 
   RendererSettings renderer_settings_;
   // Scene scene_{"../../scenes/base.xml"};
-  Scene scene_{"../../scenes/cornell_specular.xml"};
+  Scene scene_{"../../scenes/cornell.xml"};
 
   /* CPU Renderer Assets */
   std::vector<glm::vec4> accumulation_color_;
