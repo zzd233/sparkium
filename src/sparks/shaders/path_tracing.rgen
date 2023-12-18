@@ -134,6 +134,29 @@ vec3 SampleRay(vec3 origin, vec3 direction) {
       } else {
         direction -= 2.0f * dot(hit_record.normal, direction) * hit_record.normal;
       }
+    } else if (material.material_type == MATERIAL_TYPE_PRINCIPLED) {
+      if (dot(hit_record.normal, direction) > 0.0f)
+        hit_record.normal *= -1.0f;
+      float a = acos(sqrt(1 - fract(RandomFloat())));
+      float b = fract(RandomFloat()) * PI * 2;
+      vec3 dir = vec3(sin(b) * cos(a), cos(b) * cos(a), sin(a));
+      if (dot(dir, hit_record.normal) < 0.0f)
+          dir *= -1;
+      // cosine importance sampling
+      vec3 specular_out = direction - 2 * dot(direction, hit_record.normal) * hit_record.normal;
+      float cosine = max(0, dot(dir, specular_out));
+      // Phong model
+      float kd = 0.2;
+      float ks = 1-kd;
+      int n = 8;
+      float t1 = kd;
+      float t2 = ks * (n+2) / 2 * pow(cosine,n);
+
+      throughput *= (material.albedo_color * (t1 + t2) / PI) * 
+                    vec3(texture(texture_samplers[material.albedo_texture_id],
+                                 hit_record.tex_coord)) * PI;
+      origin = hit_record.position;
+      direction = dir;
     } else {
       throughput *= material.albedo_color *
                     vec3(texture(texture_samplers[material.albedo_texture_id],
