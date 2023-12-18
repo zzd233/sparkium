@@ -64,7 +64,6 @@ void TraceRay(vec3 origin, vec3 direction) {
 
   traceRayEXT(scene, gl_RayFlagsOpaqueEXT, 0xff, 0, 0, 0, origin, tmin,
               direction, tmax, 0);
-  hit_record = GetHitRecord(ray_payload, origin, direction);
 }
 
 vec3 SampleRay(vec3 origin, vec3 direction) {
@@ -81,12 +80,16 @@ vec3 SampleRay(vec3 origin, vec3 direction) {
       radiance += throughput * SampleEnvmap(direction);
       break;
     }
-    Material material = materials[hit_record.hit_entity_id];
-    hit_record.normal = normalize(hit_record.normal);
+    Material material = materials[ray_payload.object_id];
+    
+    if (RandomFloat() > material.alpha) {
+      origin = ray_payload.t * direction + origin;
+      continue;
+    }
 
-    if (fract(RandomFloat()) > RR_P)
-      break;
-    throughput /= RR_P;
+    hit_record = GetHitRecord(ray_payload, origin, direction);
+    hit_record.normal = normalize(hit_record.normal);
+    
     if (material.material_type == MATERIAL_TYPE_EMISSION) {
       radiance += throughput * material.emission * material.emission_strength;
       break;
@@ -98,8 +101,8 @@ vec3 SampleRay(vec3 origin, vec3 direction) {
     } else if (material.material_type == MATERIAL_TYPE_LAMBERTIAN) {
       if (dot(hit_record.normal, direction) > 0.0f)
         hit_record.normal *= -1.0f;
-      float a = acos(sqrt(1 - fract(RandomFloat())));
-      float b = fract(RandomFloat()) * PI * 2;
+      float a = acos(sqrt(1 - RandomFloat()));
+      float b = RandomFloat() * PI * 2;
       vec3 dir = vec3(sin(b) * cos(a), cos(b) * cos(a), sin(a));
       if (dot(dir, hit_record.normal) < 0.0f)
           dir *= -1;
@@ -129,7 +132,7 @@ vec3 SampleRay(vec3 origin, vec3 direction) {
         prob = (sqrtRs*sqrtRs + sqrtRp*sqrtRp) / 2;
       }
       origin = hit_record.position;
-      if (fract(RandomFloat()) > prob) {
+      if (RandomFloat() > prob) {
         direction = cos_o * hit_record.normal + sin_o * normalize(direction - dot(direction, hit_record.normal) * hit_record.normal);
       } else {
         direction -= 2.0f * dot(hit_record.normal, direction) * hit_record.normal;
@@ -137,8 +140,8 @@ vec3 SampleRay(vec3 origin, vec3 direction) {
     } else if (material.material_type == MATERIAL_TYPE_PRINCIPLED) {
       if (dot(hit_record.normal, direction) > 0.0f)
         hit_record.normal *= -1.0f;
-      float a = acos(sqrt(1 - fract(RandomFloat())));
-      float b = fract(RandomFloat()) * PI * 2;
+      float a = acos(sqrt(1 - RandomFloat()));
+      float b = RandomFloat() * PI * 2;
       vec3 dir = vec3(sin(b) * cos(a), cos(b) * cos(a), sin(a));
       if (dot(dir, hit_record.normal) < 0.0f)
           dir *= -1;
@@ -171,6 +174,10 @@ vec3 SampleRay(vec3 origin, vec3 direction) {
       }
       break;
     }
+
+    if (RandomFloat() > RR_P)
+      break;
+    throughput /= RR_P;
   }
   return radiance;
 }
