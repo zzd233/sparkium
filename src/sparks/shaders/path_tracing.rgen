@@ -69,7 +69,9 @@ void TraceRay(vec3 origin, vec3 direction) {
 vec3 SampleRay(vec3 origin, vec3 direction) {
   vec3 radiance = vec3(0.0);
   vec3 throughput = vec3(1.0);
-
+  vec3 next_absorb = vec3(1.0);
+  bool exp_absorb = false;
+  
   float RR_P = 0.9;
 
   for (int b = 0; b < guo.num_bounces; b++) {
@@ -89,7 +91,14 @@ vec3 SampleRay(vec3 origin, vec3 direction) {
 
     hit_record = GetHitRecord(ray_payload, origin, direction);
     hit_record.normal = normalize(hit_record.normal);
-    
+    float hit_dis = length(hit_record.position - origin);
+    if(false && exp_absorb && !hit_record.front_face) {
+      vec3 absorb_by_dis = vec3(exp(- next_absorb[0] * hit_dis), exp(- next_absorb[1] * hit_dis), exp(- next_absorb[2] * hit_dis));
+      throughput *= absorb_by_dis;
+    }
+    next_absorb = vec3(1.0);
+    exp_absorb = false;
+
     if (material.material_type == MATERIAL_TYPE_EMISSION) {
       radiance += throughput * material.emission * material.emission_strength;
       break;
@@ -134,6 +143,11 @@ vec3 SampleRay(vec3 origin, vec3 direction) {
       origin = hit_record.position;
       if (RandomFloat() > prob) {
         direction = cos_o * hit_record.normal + sin_o * normalize(direction - dot(direction, hit_record.normal) * hit_record.normal);
+        // if ( material.medium_type == MEDIUM_TYPE_NONSCATTERING ) {
+        if ( false ){
+          // next_absorb = material.coef_absorption;
+          exp_absorb = true;
+        }
       } else {
         direction -= 2.0f * dot(hit_record.normal, direction) * hit_record.normal;
       }
