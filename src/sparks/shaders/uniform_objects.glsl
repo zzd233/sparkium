@@ -18,6 +18,8 @@ struct GlobalUniformObject {
   float clamp;
   float gamma;
   float aspect;
+  bool enable_mis;
+  float total_envmap_power;
 };
 
 struct EntityUniformObject {

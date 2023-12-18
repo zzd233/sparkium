@@ -21,5 +21,7 @@ struct GlobalUniformObject {
   float clamp{100.0f};
   float gamma{2.2f};
   float aspect{1.0f};
+  int enable_mis{true};
+  float total_envmap_power{0.0f};
 };
 }  // namespace sparks

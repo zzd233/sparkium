@@ -466,6 +466,8 @@ void App::UpdateImGui() {
     }
     reset_accumulation_ |= ImGui::SliderInt(
         "Bounces", &renderer_->GetRendererSettings().num_bounces, 1, 128);
+        
+    reset_accumulation_ |= ImGui::Checkbox("Enable MIS", &renderer_->GetRendererSettings().enable_mis);
 
     scene.EntityCombo("Selected Entity", &selected_entity_id_);
 
@@ -502,23 +504,23 @@ void App::UpdateImGui() {
       std::vector<const char *> material_types = {
           "Lambertian", "Specular", "Transmissive", "Principled", "Emission"};
       Material &material = scene.GetEntity(selected_entity_id_).GetMaterial();
-      reset_accumulation_ |=
+      rebuild_objs_ |=
           ImGui::Combo("Type", reinterpret_cast<int *>(&material.material_type),
                        material_types.data(), material_types.size());
-      reset_accumulation_ |= ImGui::ColorEdit3(
+      rebuild_objs_ |= ImGui::ColorEdit3(
           "Albedo Color", &material.albedo_color[0],
           ImGuiColorEditFlags_PickerHueWheel | ImGuiColorEditFlags_Float);
-      reset_accumulation_ |=
+      rebuild_objs_ |=
           scene.TextureCombo("Albedo Texture", &material.albedo_texture_id);
-      reset_accumulation_ |= ImGui::ColorEdit3(
+      rebuild_objs_ |= ImGui::ColorEdit3(
           "Emission", &material.emission[0],
           ImGuiColorEditFlags_PickerHueWheel | ImGuiColorEditFlags_Float);
-      reset_accumulation_ |=
+      rebuild_objs_ |=
           ImGui::SliderFloat("Emission Strength", &material.emission_strength,
                              0.0f, 1e5f, "%.3f", ImGuiSliderFlags_Logarithmic);
-      reset_accumulation_ |=
+      rebuild_objs_ |=
           ImGui::SliderFloat("Refraction Ratio", &material.refraction_ratio, 1.0f, 3.0f, "%.2f"); 
-      reset_accumulation_ |=
+      rebuild_objs_ |=
           ImGui::SliderFloat("Alpha", &material.alpha, 0.0f, 1.0f, "%.3f");
     }
 
@@ -557,7 +559,7 @@ void App::UpdateImGui() {
                    ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove |
                        ImGuiWindowFlags_NoTitleBar);
       statistic_window_size = ImGui::GetWindowSize();
-      reset_accumulation_ |= UpdateImGuizmo();
+      rebuild_objs_ |= UpdateImGuizmo();
       ImGui::End();
     }
 
@@ -622,6 +624,8 @@ void App::UpdateImGui() {
   }
 
   ImGui::Render();
+
+  reset_accumulation_ |= rebuild_objs_;
 }
 
 void App::UpdateDynamicBuffer() {
@@ -648,6 +652,8 @@ void App::UpdateDynamicBuffer() {
       renderer_->GetRendererSettings().num_samples;
   global_uniform_object.num_bounces =
       renderer_->GetRendererSettings().num_bounces;
+  global_uniform_object.enable_mis = renderer_->GetRendererSettings().enable_mis;
+  global_uniform_object.total_envmap_power = renderer_->GetScene().GetEnvmapTotalPower();
 
   auto &camera = renderer_->GetScene().GetCamera();
   global_uniform_object.fov = camera.GetFov();
@@ -670,6 +676,12 @@ void App::UpdateDynamicBuffer() {
     auto &entity = entities[i];
     entity_uniform_buffer_->operator[](i).model = entity.GetTransformMatrix();
     material_uniform_buffer_->operator[](i) = entity.GetMaterial();
+  }
+
+  if (rebuild_objs_) {
+    rebuild_objs_ = false;
+    
+
   }
 }
 
@@ -1200,6 +1212,8 @@ void App::OpenFile(const std::string &path) {
     renderer_->LoadTexture(path);
   } else if (absl::EndsWith(path, ".obj")) {
     renderer_->LoadObjMesh(path);
+    reset_accumulation_ = true;
+    rebuild_objs_ = true;
   } else if (absl::EndsWith(path, ".xml")) {
     renderer_->LoadScene(path);
     renderer_->ResetAccumulation();
@@ -1208,6 +1222,7 @@ void App::OpenFile(const std::string &path) {
     device_texture_samplers_.clear();
     entity_device_assets_.clear();
     selected_entity_id_ = -1;
+    rebuild_objs_ = true;
     if (app_settings_.hardware_renderer) {
       reset_accumulation_ = true;
       top_level_acceleration_structure_.reset();

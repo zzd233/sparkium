@@ -166,6 +166,8 @@ void Scene::UpdateEnvmapConfiguration() {
     }
   }
 
+  envmap_total_power_ = total_weight;
+
   auto inv_total_weight = 1.0f / total_weight;
   for (auto &v : envmap_cdf_) {
     v *= inv_total_weight;
