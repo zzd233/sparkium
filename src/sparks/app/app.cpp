@@ -680,8 +680,6 @@ void App::UpdateDynamicBuffer() {
 
   if (rebuild_objs_) {
     rebuild_objs_ = false;
-    
-
   }
 }
 
@@ -734,7 +732,11 @@ void App::UpdateDeviceAssets() {
               vulkan::raytracing::BottomLevelAccelerationStructure>(
               core_->GetDevice(), core_->GetCommandPool(), vertices, indices));
       object_info_data_.push_back({uint32_t(ray_tracing_vertex_data_.size()),
-                                   uint32_t(ray_tracing_index_data_.size())});
+                                   uint32_t(ray_tracing_index_data_.size()),
+                                   uint32_t(entity.GetModel()->GetIndices().size()/3), 0u});
+      if (entity.GetMaterial().material_type == MATERIAL_TYPE_EMISSION) {
+        light_source_object_info_data_.push_back(uint32_t(i));
+      }
       ray_tracing_vertex_data_.insert(ray_tracing_vertex_data_.end(),
                                       vertices.begin(), vertices.end());
       ray_tracing_index_data_.insert(ray_tracing_index_data_.end(),
@@ -768,6 +770,10 @@ void App::UpdateDeviceAssets() {
         std::make_unique<vulkan::framework::StaticBuffer<ObjectInfo>>(
             core_.get(), object_info_data_.size());
     object_info_buffer_->Upload(object_info_data_.data());
+    light_source_object_info_buffer_ =
+        std::make_unique<vulkan::framework::StaticBuffer<uint32_t>>(
+            core_.get(), light_source_object_info_data_.size());
+    light_source_object_info_buffer_->Upload(light_source_object_info_data_.data());
 
     rebuild_ray_tracing_pipeline_ = true;
   }
@@ -1143,6 +1149,8 @@ void App::BuildRayTracingPipeline() {
                                              VK_SHADER_STAGE_RAYGEN_BIT_KHR);
   ray_tracing_render_node_->AddUniformBinding(binding_texture_samplers_,
                                               VK_SHADER_STAGE_RAYGEN_BIT_KHR);
+  ray_tracing_render_node_->AddBufferBinding(light_source_object_info_buffer_.get(),
+                                             VK_SHADER_STAGE_RAYGEN_BIT_KHR);
   ray_tracing_render_node_->SetShaders("../../shaders/path_tracing.rgen.spv",
                                        "../../shaders/path_tracing.rmiss.spv",
                                        "../../shaders/path_tracing.rchit.spv");
@@ -1228,6 +1236,7 @@ void App::OpenFile(const std::string &path) {
       top_level_acceleration_structure_.reset();
       bottom_level_acceleration_structures_.clear();
       object_info_data_.clear();
+      light_source_object_info_data_.clear();
       ray_tracing_vertex_data_.clear();
       ray_tracing_index_data_.clear();
     }

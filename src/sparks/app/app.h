@@ -83,11 +83,14 @@ class App {
       ray_tracing_render_node_;
   std::unique_ptr<vulkan::framework::StaticBuffer<ObjectInfo>>
       object_info_buffer_;
+  std::unique_ptr<vulkan::framework::StaticBuffer<uint32_t>>
+      light_source_object_info_buffer_;
   std::unique_ptr<vulkan::framework::StaticBuffer<Vertex>>
       ray_tracing_vertex_buffer_;
   std::unique_ptr<vulkan::framework::StaticBuffer<uint32_t>>
       ray_tracing_index_buffer_;
   std::vector<ObjectInfo> object_info_data_;
+  std::vector<uint32_t> light_source_object_info_data_;
   std::vector<Vertex> ray_tracing_vertex_data_;
   std::vector<uint32_t> ray_tracing_index_data_;
 

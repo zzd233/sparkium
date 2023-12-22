@@ -29,4 +29,11 @@ struct EntityUniformObject {
 struct ObjectInfo {
   uint vertex_offset;
   uint index_offset;
+  uint n_meshes;
+  uint reserved;
+};
+
+struct LightSourceObjectInfo {
+  uint ID;
+  uint n_meshes;
 };

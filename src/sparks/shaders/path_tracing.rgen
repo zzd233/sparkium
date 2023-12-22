@@ -32,6 +32,11 @@ layout(binding = 8) readonly buffer index_array {
 };
 layout(binding = 9) uniform sampler2D[] texture_samplers;
 
+layout(binding = 10) readonly buffer light_source_object_info_array {
+  uint light_source_object_infos[];
+};
+
+
 layout(location = 0) rayPayloadEXT RayPayload ray_payload;
 
 // clang-format off
@@ -64,12 +69,60 @@ void TraceRay(vec3 origin, vec3 direction) {
 
   traceRayEXT(scene, gl_RayFlagsOpaqueEXT, 0xff, 0, 0, 0, origin, tmin,
               direction, tmax, 0);
+  hit_record = GetHitRecord(ray_payload, origin, direction);
 }
 
-vec3 EvalBSDF(Material m, vec3 N, vec3 dir_in, vec3 dir_out) {
-  N = normalize(N);
+void SampleLight(vec3 O, vec3 N, out vec3 dir, out vec3 eval, out float pdf) {
+  int n_ls = light_source_object_infos.length();
+  if (n_ls == 0) {
+    eval = vec3(0);
+    pdf = 0;
+    return;
+  }
+  int obj_id = int(light_source_object_infos[int(RandomFloat() * n_ls)]);
+  ObjectInfo obj = object_infos[obj_id];
+  int n_meshes = int(obj.n_meshes);
+  int mesh_id = int(RandomFloat() * n_meshes);
+  Vertex v0 = GetVertex(obj.vertex_offset + indices[obj.index_offset + mesh_id * 3 + 0]);
+  Vertex v1 = GetVertex(obj.vertex_offset + indices[obj.index_offset + mesh_id * 3 + 1]);
+  Vertex v2 = GetVertex(obj.vertex_offset + indices[obj.index_offset + mesh_id * 3 + 2]);
+  vec3 mesh_normal = cross(v1.position - v0.position, v2.position - v0.position);
+  float area = length(mesh_normal) / 2;
+  mesh_normal = normalize(mesh_normal);
+  float r0 = RandomFloat(), r1 = RandomFloat(), r2;
+  if (r0 + r1 > 1) {
+    r0 = 1 - r0;
+    r1 = 1 - r1;
+  }
+  r2 = 1 - r0 - r1;
+  vec3 sampled_position = r0 * v0.position + r1 * v1.position + r2 * v2.position;
+  dir = sampled_position - O;
+  TraceRay(O, normalize(dir));
+  if (dot(N, dir) > 0 && ray_payload.t > 1e-4 && length(sampled_position - hit_record.position) < 1e-4){
+    Material m = materials[obj_id];
+    float cos_ = abs(dot(hit_record.normal, normalize(dir)));
+    pdf = 1.0 / n_ls / n_meshes / (area * cos_ / (ray_payload.t * ray_payload.t));
+    eval = m.emission * m.emission_strength * n_ls * n_meshes * area * cos_ / (ray_payload.t * ray_payload.t);
+  } else {
+    eval = vec3(0);
+    pdf = 0;
+  }
+  dir = normalize(dir);
+}
+
+float EvalPDF(Material m, vec3 N, vec3 dir_in, vec3 dir_out, out vec3 eval) {
   dir_in = normalize(dir_in);
   dir_out = normalize(dir_out);
+  eval = vec3(0);
+  if (m.material_type == MATERIAL_TYPE_LAMBERTIAN) {
+    float pdf = dot(N, dir_out) / PI;
+    eval = hit_record.base_color / PI * dot(N, dir_out);
+    return pdf;
+  }
+  if (m.material_type == MATERIAL_TYPE_PRINCIPLED) {
+    return 0;
+  }
+  return 0;
 }
 
 vec3 SampleRay(vec3 origin, vec3 direction) {
@@ -79,9 +132,11 @@ vec3 SampleRay(vec3 origin, vec3 direction) {
   bool exp_absorb = false;
   
   float RR_P = 0.9;
-  float lastpdf = 1.0;
+  float lastpdf = 1e6;
+  float mis_ratio = 1.0;
+  vec3 lastN = vec3(0);
 
-  for (int b = 0; b < guo.num_bounces; b++) {
+  for (int b = 0; true || b < guo.num_bounces; b++) {
     direction = normalize(direction);
     TraceRay(origin, direction);
 
@@ -91,13 +146,12 @@ vec3 SampleRay(vec3 origin, vec3 direction) {
     }
     Material material = materials[ray_payload.object_id];
     
-    if (RandomFloat() > material.alpha) {
-      origin = ray_payload.t * direction + origin;
-      continue;
-    }
+    // if (RandomFloat() > material.alpha) {
+    //   origin = ray_payload.t * direction + origin;
+    //   continue;
+    // }
 
-    hit_record = GetHitRecord(ray_payload, origin, direction);
-    hit_record.normal = normalize(hit_record.normal);
+    lastN = hit_record.normal;
     float hit_dis = length(hit_record.position - origin);
     if(false && exp_absorb && !hit_record.front_face) {
       vec3 absorb_by_dis = vec3(exp(- next_absorb[0] * hit_dis), exp(- next_absorb[1] * hit_dis), exp(- next_absorb[2] * hit_dis));
@@ -105,13 +159,44 @@ vec3 SampleRay(vec3 origin, vec3 direction) {
     }
     next_absorb = vec3(1.0);
     exp_absorb = false;
-    
-    if (guo.enable_mis) {
-      return vec3(0);
-    }
 
+    if (guo.enable_mis) {
+      vec3 N = hit_record.normal;
+      if (dot(N, direction) > 0)
+        N *= -1;
+      vec3 eval, dir, eval_obj;
+      float pdf;
+      SampleLight(hit_record.position, N, dir, eval, pdf);
+      TraceRay(origin, direction);
+      float obj_pdf = EvalPDF(material, N, direction, dir, eval_obj);
+      if (pdf > 1e-4) {
+        radiance += throughput * eval * eval_obj * (pdf * pdf) / (pdf * pdf + obj_pdf * obj_pdf);
+      }
+    }
+    
+    if (RandomFloat() > RR_P)
+      break;
+    throughput /= RR_P;
+    
     if (material.material_type == MATERIAL_TYPE_EMISSION) {
-      radiance += throughput * material.emission * material.emission_strength;
+      mis_ratio = 1;
+      if (guo.enable_mis && b > 0) {
+        float pdf;
+        int n_ls = light_source_object_infos.length();
+        ObjectInfo obj = object_infos[ray_payload.object_id];
+        int n_meshes = int(obj.n_meshes);
+        int mesh_id = int(ray_payload.primitive_id);
+        Vertex v0 = GetVertex(obj.vertex_offset + indices[obj.index_offset + mesh_id * 3 + 0]);
+        Vertex v1 = GetVertex(obj.vertex_offset + indices[obj.index_offset + mesh_id * 3 + 1]);
+        Vertex v2 = GetVertex(obj.vertex_offset + indices[obj.index_offset + mesh_id * 3 + 2]);
+        vec3 mesh_normal = cross(v1.position - v0.position, v2.position - v0.position);
+        float area = length(mesh_normal) / 2;
+        mesh_normal = normalize(mesh_normal);
+        float cos_ = abs(dot(direction, hit_record.normal));
+        pdf = 1.0 / n_ls / n_meshes / (area * cos_ / (ray_payload.t * ray_payload.t));
+        mis_ratio = (lastpdf * lastpdf) / (lastpdf * lastpdf + pdf * pdf);
+      }
+      radiance += throughput * material.emission * material.emission_strength * mis_ratio;
       break;
     } else if (material.material_type == MATERIAL_TYPE_SPECULAR) {
       if (dot(hit_record.normal, direction) > 0.0f)
@@ -135,7 +220,7 @@ vec3 SampleRay(vec3 origin, vec3 direction) {
       float pdf = dir.z / PI;
       dir = x * dir.x + y * dir.y + N * dir.z;
       if (dot(N, dir) > 0) {
-        throughput *= vec3(pdf) * hit_record.base_color / pdf;
+        throughput *= dot(N, normalize(dir)) / PI * hit_record.base_color / pdf;
       } else {
         throughput *= 0;
         break;
@@ -181,9 +266,6 @@ vec3 SampleRay(vec3 origin, vec3 direction) {
       break;
     }
 
-    if (RandomFloat() > RR_P)
-      break;
-    throughput /= RR_P;
   }
   return radiance;
 }
