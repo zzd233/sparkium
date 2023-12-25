@@ -122,8 +122,8 @@ float EvalPDF(Material m, vec3 N, vec3 dir_in, vec3 dir_out, out vec3 eval) {
   if (m.material_type == MATERIAL_TYPE_PRINCIPLED) {
     float pdf = dot(N, dir_out) / PI;
 
-    float kd = 0.2;
-    float ks = 1-kd;
+    float kd = 1 - m.metallization;
+    float ks = 1 - kd;
     int n = 8;
 
     vec3 spe_out_direction = dir_in - 2.0 * dot(N, dir_in) * N;
@@ -286,7 +286,7 @@ vec3 SampleRay(vec3 origin, vec3 direction) {
         float pdf = dir.z / PI;
         dir = x * dir.x + y * dir.y + N * dir.z;
 
-        float kd = 0.2;
+        float kd = 1 - material.metallization;
         float ks = 1-kd;
         int n = 8;
 

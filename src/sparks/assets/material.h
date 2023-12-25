@@ -32,7 +32,7 @@ struct Material {
   float alpha{1.0f};
   MaterialType material_type{MATERIAL_TYPE_LAMBERTIAN};
   // MediumType medium_type{MEDIUM_TYPE_VACUUM};
-  float reserve[1]{};
+  float metallization{0.8};
   Material() = default;
   explicit Material(const glm::vec3 &albedo);
   Material(Scene *scene, const tinyxml2::XMLElement *material_element);

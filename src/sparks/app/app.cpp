@@ -522,6 +522,8 @@ void App::UpdateImGui() {
           ImGui::SliderFloat("Refraction Ratio", &material.refraction_ratio, 1.0f, 3.0f, "%.2f"); 
       rebuild_objs_ |=
           ImGui::SliderFloat("Alpha", &material.alpha, 0.0f, 1.0f, "%.3f");
+      rebuild_objs_ |=
+          ImGui::SliderFloat("Metallization", &material.metallization, 0.0f, 1.0f, "%.3f");
     }
 
 #if !defined(NDEBUG)

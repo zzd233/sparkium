@@ -9,6 +9,7 @@ struct Material {
   // vec3 coef_absorption;
   float alpha;
   uint material_type;
+  float metallization;
   // uint medium_type;
 };
 
