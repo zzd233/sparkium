@@ -120,7 +120,20 @@ float EvalPDF(Material m, vec3 N, vec3 dir_in, vec3 dir_out, out vec3 eval) {
     return pdf;
   }
   if (m.material_type == MATERIAL_TYPE_PRINCIPLED) {
-    return 0;
+    float pdf = dot(N, dir_out) / PI;
+
+    float kd = 0.2;
+    float ks = 1-kd;
+    int n = 8;
+
+    vec3 spe_out_direction = dir_in - 2.0 * dot(N, dir_in) * N;
+    float cosine = max(0,dot(dir_out, spe_out_direction));
+
+    float t1 = kd * INV_PI;
+    float t2 = ks * (n+2) * INV_PI / 2 * pow(cosine,n);
+
+    eval = vec3(t1+t2) * hit_record.base_color * dot(N, dir_out);
+    return pdf;
   }
   return 0;
 }
@@ -219,12 +232,7 @@ vec3 SampleRay(vec3 origin, vec3 direction) {
       vec3 dir = vec3(sin(r1) * sqrt(1.0 - r2), cos(r1) * sqrt(1.0 - r2), sqrt(r2));
       float pdf = dir.z / PI;
       dir = x * dir.x + y * dir.y + N * dir.z;
-      if (dot(N, dir) > 0) {
-        throughput *= dot(N, normalize(dir)) / PI * hit_record.base_color / pdf;
-      } else {
-        throughput *= 0;
-        break;
-      }
+      throughput *= dot(N, normalize(dir)) / PI * hit_record.base_color / pdf;
       origin = hit_record.position;
       direction = dir;
       lastpdf = pdf;
@@ -262,6 +270,36 @@ vec3 SampleRay(vec3 origin, vec3 direction) {
         direction -= 2.0f * dot(hit_record.normal, direction) * hit_record.normal;
         lastpdf = 1e6;
       }
+    } else if (material.material_type == MATERIAL_TYPE_PRINCIPLED) {
+        if (dot(hit_record.normal, direction) > 0.0f)
+          hit_record.normal *= -1.0f;
+        float r1 = RandomFloat() * PI * 2;
+        float r2 = RandomFloat();
+
+        vec3 N = hit_record.normal, x, y;
+        x = vec3(N.z - N.y, N.x - N.z, N.y - N.x);
+        if (N.x == N.y && N.x == N.z)
+          x = vec3(N.z - N.y, N.x + N.z, -N.y - N.x);
+        x = normalize(x);
+        y = cross(N, x);
+        vec3 dir = vec3(sin(r1) * sqrt(1.0 - r2), cos(r1) * sqrt(1.0 - r2), sqrt(r2));
+        float pdf = dir.z / PI;
+        dir = x * dir.x + y * dir.y + N * dir.z;
+
+        float kd = 0.2;
+        float ks = 1-kd;
+        int n = 8;
+
+        vec3 spe_out_direction = direction - 2.0f * dot(hit_record.normal, direction) * hit_record.normal;
+        float cosine = max(0,dot(dir, spe_out_direction));
+
+        float t1 = kd * INV_PI;
+        float t2 = ks * (n+2) * INV_PI / 2 * pow(cosine,n);
+
+        throughput *= vec3(t1+t2) * hit_record.base_color * PI;
+        origin = hit_record.position;
+        direction = dir;
+        lastpdf = pdf;
     } else {
       break;
     }
