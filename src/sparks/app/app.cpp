@@ -503,6 +503,8 @@ void App::UpdateImGui() {
       static int current_item = 0;
       std::vector<const char *> material_types = {
           "Lambertian", "Specular", "Transmissive", "Principled", "Emission"};
+      std::vector<const char *> medium_types = {
+          "Vacuum", "Nonscattering", "Isotropicscattering"};
       Material &material = scene.GetEntity(selected_entity_id_).GetMaterial();
       rebuild_objs_ |=
           ImGui::Combo("Type", reinterpret_cast<int *>(&material.material_type),
@@ -518,6 +520,15 @@ void App::UpdateImGui() {
       rebuild_objs_ |=
           ImGui::SliderFloat("Emission Strength", &material.emission_strength,
                              0.0f, 1e5f, "%.3f", ImGuiSliderFlags_Logarithmic);
+      rebuild_objs_ |=
+          ImGui::Combo("Medium Type", reinterpret_cast<int *>(&material.medium_type),
+                       medium_types.data(), medium_types.size());
+      rebuild_objs_ |= ImGui::ColorEdit3(
+          "Scattering Coef", &material.coef_scattering[0],
+          ImGuiColorEditFlags_PickerHueWheel | ImGuiColorEditFlags_Float);
+      rebuild_objs_ |= ImGui::ColorEdit3(
+          "Absorption Coef", &material.coef_absorption[0],
+          ImGuiColorEditFlags_PickerHueWheel | ImGuiColorEditFlags_Float);
       rebuild_objs_ |=
           ImGui::SliderFloat("Refraction Ratio", &material.refraction_ratio, 1.0f, 3.0f, "%.2f"); 
       rebuild_objs_ |=

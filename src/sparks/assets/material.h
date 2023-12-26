@@ -26,13 +26,14 @@ struct Material {
   int albedo_texture_id{0};
   glm::vec3 emission{0.0f};
   float emission_strength{1.0f};
-  // glm::vec3 coef_scattering;
+  glm::vec3 coef_scattering;
   float refraction_ratio{1.5f};
-  // glm::vec3 coef_absorption;
+  glm::vec3 coef_absorption;
   float alpha{1.0f};
   MaterialType material_type{MATERIAL_TYPE_LAMBERTIAN};
-  // MediumType medium_type{MEDIUM_TYPE_VACUUM};
   float metallization{0.8};
+  MediumType medium_type{MEDIUM_TYPE_VACUUM};
+  int useless_1{0};
   Material() = default;
   explicit Material(const glm::vec3 &albedo);
   Material(Scene *scene, const tinyxml2::XMLElement *material_element);

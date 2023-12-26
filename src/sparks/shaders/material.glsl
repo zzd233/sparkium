@@ -4,13 +4,14 @@ struct Material {
   int albedo_texture_id;
   vec3 emission;
   float emission_strength;
-  // vec3 coef_scattering;
+  vec3 coef_scattering;
   float refraction_ratio;
-  // vec3 coef_absorption;
+  vec3 coef_absorption;
   float alpha;
   uint material_type;
   float metallization;
-  // uint medium_type;
+  uint medium_type;
+  uint uesless_1;
 };
 
 #define MEDIUM_TYPE_VACUUM 0
