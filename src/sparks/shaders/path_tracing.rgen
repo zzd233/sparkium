@@ -173,6 +173,8 @@ vec3 SampleRay(vec3 origin, vec3 direction) {
     lastN = hit_record.normal;
     bool lost_in_medium = in_medium;
     if(in_medium) {
+      if(material.medium_type != cur_medium_type)
+        return vec3(0.0);
       float tFar = length(hit_record.position - origin);
       float dis = MediumSampleDistance(cur_medium_type, cur_coef_scattering, tFar, lastpdf, col);
       vec3 absorb_by_dis = Transmission(cur_medium_type, cur_coef_absorption, dis);
@@ -184,14 +186,13 @@ vec3 SampleRay(vec3 origin, vec3 direction) {
       }
       if(dis == tFar) lost_in_medium = false;
       else{
-        // throughput *= vec3(0.0, 0.0, 1.0);
         origin = origin + dis * direction;
         direction = SampleScatterDirection(cur_medium_type, direction, lastpdf);
       }
       // vec3(exp(- next_absorb[0] * hit_dis), exp(- next_absorb[1] * hit_dis), exp(- next_absorb[2] * hit_dis));
     }
 
-    if (guo.enable_mis && ! lost_in_medium) {
+    if (guo.enable_mis && ! in_medium) {
       vec3 N = hit_record.normal;
       if (dot(N, direction) > 0)
         N *= -1;
@@ -232,9 +233,9 @@ vec3 SampleRay(vec3 origin, vec3 direction) {
       vec3 dir = vec3(sin(r1) * sqrt(1.0 - r2), cos(r1) * sqrt(1.0 - r2), sqrt(r2));
       float pdf = dir.z / PI;
       dir = x * dir.x + y * dir.y + N * dir.z;
-      // throughput *= dot(N, normalize(dir)) / PI * hit_record.base_color / pdf;
+      throughput *= dot(N, normalize(dir)) / PI *hit_record.base_color / pdf;
       origin = hit_record.position;
-      direction = dir - 2.0 * dot(dir, hit_record.normal) * hit_record.normal;
+      direction = - dir;
       lastpdf = pdf;
     } else if (material.material_type == MATERIAL_TYPE_EMISSION) {
       mis_ratio = 1;

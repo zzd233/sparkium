@@ -533,7 +533,7 @@ void App::UpdateImGui() {
       //     "Absorption Coef", &material.coef_absorption[0],
       //     ImGuiColorEditFlags_PickerHueWheel | ImGuiColorEditFlags_Float);
       rebuild_objs_ |=
-          ImGui::SliderFloat("Scatter Distance", &material.dis_scattering, 0.0001f, 1.0f, "%.4f"); 
+          ImGui::SliderFloat("Scatter Distance", &material.dis_scattering, 0.0001f, 100.0f, "%.4f"); 
       rebuild_objs_ |=
           ImGui::SliderFloat("Absorption Distance", &material.dis_absorption, 0.01f, 400.0f, "%.2f"); 
       rebuild_objs_ |=
