@@ -175,7 +175,7 @@ vec3 SampleRay(vec3 origin, vec3 direction) {
     if(in_medium) {
       float tFar = length(hit_record.position - origin);
       float dis = MediumSampleDistance(cur_medium_type, cur_coef_scattering, tFar, lastpdf, col);
-      vec3 absorb_by_dis = Transmission(cur_coef_absorption, dis);
+      vec3 absorb_by_dis = Transmission(cur_medium_type, cur_coef_absorption, dis);
       throughput *= absorb_by_dis;
       if(col != -1){
         if(col == 0) throughput *= vec3(1.0, 0.0, 0.0);
@@ -184,13 +184,14 @@ vec3 SampleRay(vec3 origin, vec3 direction) {
       }
       if(dis == tFar) lost_in_medium = false;
       else{
+        throughput = vec3(0.0,0.0,1.0);
         origin = origin + dis * direction;
         direction = SampleScatterDirection(cur_medium_type, direction, lastpdf);
       }
       // vec3(exp(- next_absorb[0] * hit_dis), exp(- next_absorb[1] * hit_dis), exp(- next_absorb[2] * hit_dis));
     }
 
-    if (guo.enable_mis && ! in_medium) {
+    if (guo.enable_mis && ! lost_in_medium) {
       vec3 N = hit_record.normal;
       if (dot(N, direction) > 0)
         N *= -1;
@@ -209,9 +210,13 @@ vec3 SampleRay(vec3 origin, vec3 direction) {
       break;
     throughput /= RR_P;
     if(lost_in_medium) continue;
-    in_medium = false;
-    cur_medium_type = MEDIUM_TYPE_VACUUM;
-    
+
+    if (material.material_type != MATERIAL_TYPE_TRANSMISSIVE){
+      in_medium = false;
+      cur_medium_type = MEDIUM_TYPE_VACUUM;
+    }
+
+
     if (material.material_type == MATERIAL_TYPE_EMISSION) {
       mis_ratio = 1;
       if (guo.enable_mis && b > 0) {
@@ -281,11 +286,11 @@ vec3 SampleRay(vec3 origin, vec3 direction) {
         origin = hit_record.position;
         direction = cos_o * hit_record.normal + sin_o * normalize(direction - dot(direction, hit_record.normal) * hit_record.normal);
         lastpdf = 1e6;
-        if (hit_record.front_face) {
-          in_medium = true;
+        if (material.medium_type != MEDIUM_TYPE_VACUUM) {
+          in_medium = !in_medium;
           cur_medium_type = material.medium_type;
-          cur_coef_absorption = material.coef_absorption;
-          cur_coef_scattering = material.coef_scattering;
+          cur_coef_absorption = -log( vec3(0.909674656, 0.4902986733, 0.4901986733) ) / material.dis_absorption;
+          cur_coef_scattering = vec3( 1.0 / material.dis_scattering );
         }
       } else {
         origin = hit_record.position;

@@ -26,9 +26,9 @@ struct Material {
   int albedo_texture_id{0};
   glm::vec3 emission{0.0f};
   float emission_strength{1.0f};
-  glm::vec3 coef_scattering{vec3(0.9801986733, 0.00609674656, 0.00334596545)};
+  float dis_scattering{0.0001f};
   float refraction_ratio{1.5f};
-  glm::vec3 coef_absorption{vec3(0.9801986733, 0.00609674656, 0.00334596545)};
+  float dis_absorption{1.0};
   float alpha{1.0f};
   MaterialType material_type{MATERIAL_TYPE_LAMBERTIAN};
   float metallization{0.8};

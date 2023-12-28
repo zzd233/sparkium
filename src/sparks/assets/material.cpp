@@ -71,14 +71,14 @@ Material::Material(Scene *scene, const tinyxml2::XMLElement *material_element)
     metallization = std::stof(child_element->FindAttribute("value")->Value());
   }
 
-  child_element = material_element->FirstChildElement("coef_scattering");
+  child_element = material_element->FirstChildElement("dis_scattering");
   if (child_element) {
-    coef_scattering = StringToVec3(child_element->FindAttribute("value")->Value());
+    dis_scattering = std::stof(child_element->FindAttribute("value")->Value());
   }
 
-  child_element = material_element->FirstChildElement("coef_absorption");
+  child_element = material_element->FirstChildElement("dis_absorption");
   if (child_element) {
-    coef_absorption = StringToVec3(child_element->FindAttribute("value")->Value());
+    dis_absorption = std::stof(child_element->FindAttribute("value")->Value());
   }
 
   child_element = material_element->FirstChildElement("useless_1");

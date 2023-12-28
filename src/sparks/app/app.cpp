@@ -523,14 +523,18 @@ void App::UpdateImGui() {
       rebuild_objs_ |=
           ImGui::Combo("Medium Type", reinterpret_cast<int *>(&material.medium_type),
                        medium_types.data(), medium_types.size());
-      rebuild_objs_ |= ImGui::ColorEdit3(
-          "Scattering Coef", &material.coef_scattering[0],
-          ImGuiColorEditFlags_PickerHueWheel | ImGuiColorEditFlags_Float);
-      rebuild_objs_ |= ImGui::ColorEdit3(
-          "Absorption Coef", &material.coef_absorption[0],
-          ImGuiColorEditFlags_PickerHueWheel | ImGuiColorEditFlags_Float);
+      // rebuild_objs_ |= ImGui::ColorEdit3(
+      //     "Scattering Coef", &material.coef_scattering[0],
+      //     ImGuiColorEditFlags_PickerHueWheel | ImGuiColorEditFlags_Float);
+      // rebuild_objs_ |= ImGui::ColorEdit3(
+      //     "Absorption Coef", &material.coef_absorption[0],
+      //     ImGuiColorEditFlags_PickerHueWheel | ImGuiColorEditFlags_Float);
       rebuild_objs_ |=
-          ImGui::SliderFloat("Refraction Ratio", &material.refraction_ratio, 1.0f, 3.0f, "%.2f"); 
+          ImGui::SliderFloat("Scatter Distance", &material.dis_scattering, 0.0001f, 400.0f, "%.4f"); 
+      rebuild_objs_ |=
+          ImGui::SliderFloat("Absorption Distance", &material.dis_absorption, 0.01f, 400.0f, "%.2f"); 
+      rebuild_objs_ |=
+          ImGui::SliderFloat("Refraction Ratio", &material.refraction_ratio, 0.0f, 1.0f, "%.2f"); 
       rebuild_objs_ |=
           ImGui::SliderFloat("Alpha", &material.alpha, 0.0f, 1.0f, "%.3f");
       rebuild_objs_ |=

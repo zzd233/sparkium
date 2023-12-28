@@ -4,9 +4,9 @@ struct Material {
   int albedo_texture_id;
   vec3 emission;
   float emission_strength;
-  vec3 coef_scattering;
+  float dis_scattering;
   float refraction_ratio;
-  vec3 coef_absorption;
+  float dis_absorption;
   float alpha;
   uint material_type;
   float metallization;

@@ -1,7 +1,7 @@
 
 float MediumSampleDistance(uint medium_type, vec3 coef_scattering, float tFar, inout float pdf, inout int col){
     float dis = tFar;
-    pdf = 1.0;
+    pdf = 1e6;
     if(medium_type == MEDIUM_TYPE_ISOTROPICSCATTERING){
         if(col == -1){
             if(RandomFloat() < 0.333333) col = 0;
@@ -19,15 +19,18 @@ float MediumSampleDistance(uint medium_type, vec3 coef_scattering, float tFar, i
 
 vec3 SampleScatterDirection(uint medium_type, vec3 dir, inout float pdf){
     if(medium_type == MEDIUM_TYPE_ISOTROPICSCATTERING){
-        pdf = 0.25 * 3.1415926535897932384626433832795;
+        pdf = 0.25 / 3.1415926535897932384626433832795;
         return RandomOnSphere();
     }
+    pdf = 1e6;
     return dir;
 }
 
 // float ScatterDirectionPdf(uint medium_type, vec3 coef_absorption, vec3 coef_scattering){
 // }
 
-vec3 Transmission(vec3 coef_absorption, float dis){
+vec3 Transmission(uint medium_type, vec3 coef_absorption, float dis){
+    if(medium_type == MEDIUM_TYPE_VACUUM)
+        return vec3(1.0, 1.0, 1.0);
     return vec3(exp(- coef_absorption[0] * dis), exp(- coef_absorption[1] * dis), exp(- coef_absorption[2] * dis));
 }
