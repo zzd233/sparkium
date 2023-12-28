@@ -184,7 +184,6 @@ vec3 SampleRay(vec3 origin, vec3 direction) {
       }
       if(dis == tFar) lost_in_medium = false;
       else{
-        throughput = vec3(0.0,0.0,1.0);
         origin = origin + dis * direction;
         direction = SampleScatterDirection(cur_medium_type, direction, lastpdf);
       }
@@ -211,13 +210,32 @@ vec3 SampleRay(vec3 origin, vec3 direction) {
     throughput /= RR_P;
     if(lost_in_medium) continue;
 
-    if (material.material_type != MATERIAL_TYPE_TRANSMISSIVE){
-      in_medium = false;
-      cur_medium_type = MEDIUM_TYPE_VACUUM;
-    }
 
+    if (material.material_type == MATERIAL_TYPE_SUBSURFACE) {
+      in_medium = !in_medium;
+      cur_medium_type = material.medium_type;
+      cur_coef_absorption = -log( vec3(0.909674656, 0.8902986733, 0.8901986733) ) / material.dis_absorption;
+      cur_coef_scattering = vec3( 1.0 / material.dis_scattering );
 
-    if (material.material_type == MATERIAL_TYPE_EMISSION) {
+      if (dot(hit_record.normal, direction) > 0.0f)
+        hit_record.normal *= -1.0f;
+      float r1 = RandomFloat() * PI * 2;
+      float r2 = RandomFloat();
+
+      vec3 N = hit_record.normal, x, y;
+      x = vec3(N.z - N.y, N.x - N.z, N.y - N.x);
+      if (N.x == N.y && N.x == N.z)
+        x = vec3(N.z - N.y, N.x + N.z, -N.y - N.x);
+      x = normalize(x);
+      y = cross(N, x);
+      vec3 dir = vec3(sin(r1) * sqrt(1.0 - r2), cos(r1) * sqrt(1.0 - r2), sqrt(r2));
+      float pdf = dir.z / PI;
+      dir = x * dir.x + y * dir.y + N * dir.z;
+      throughput *= dot(N, normalize(dir)) / PI * hit_record.base_color / pdf;
+      origin = hit_record.position;
+      direction = dir;
+      lastpdf = pdf;
+    } else if (material.material_type == MATERIAL_TYPE_EMISSION) {
       mis_ratio = 1;
       if (guo.enable_mis && b > 0) {
         float pdf;
@@ -286,12 +304,6 @@ vec3 SampleRay(vec3 origin, vec3 direction) {
         origin = hit_record.position;
         direction = cos_o * hit_record.normal + sin_o * normalize(direction - dot(direction, hit_record.normal) * hit_record.normal);
         lastpdf = 1e6;
-        if (material.medium_type != MEDIUM_TYPE_VACUUM) {
-          in_medium = !in_medium;
-          cur_medium_type = material.medium_type;
-          cur_coef_absorption = -log( vec3(0.909674656, 0.4902986733, 0.4901986733) ) / material.dis_absorption;
-          cur_coef_scattering = vec3( 1.0 / material.dis_scattering );
-        }
       } else {
         origin = hit_record.position;
         direction -= 2.0f * dot(hit_record.normal, direction) * hit_record.normal;
@@ -342,18 +354,28 @@ void main() {
 
   mat4 camera_to_world = inverse(guo.camera);
   mat4 screen_to_camera = inverse(guo.projection);
+  
+  vec3 total_radiance = vec3(0.0);
 
   for (int i = 0; i < guo.num_samples; i++) {
     InitRandomSeed(uint(pixelCenter.x), uint(pixelCenter.y),
                    guo.accumulated_sample + i);
-    vec4 origin = camera_to_world * vec4(0, 0, 0, 1);
-    vec4 target = screen_to_camera * vec4(d.x, d.y, 1, 1);
-    vec4 direction = camera_to_world * vec4(normalize(target.xyz), 0);
+    // vec4 origin = camera_to_world * vec4(0, 0, 0, 1);
+    vec3 origin =
+        vec3(camera_to_world *
+             vec4(RandomInCircle() * guo.aperture, 0, 1));
+    vec3 target = vec3(screen_to_camera * vec4(d.x, d.y, 1.0, 1.0));
+    target = normalize(target);
+    target *= -guo.focal_length / target.z;
+    target = vec3(camera_to_world * vec4(target, 1.0));
+    vec3 direction = normalize(target - origin);
 
-    imageStore(accumulation_color, ivec2(gl_LaunchIDEXT.xy),
-               imageLoad(accumulation_color, ivec2(gl_LaunchIDEXT.xy)) +
-                   vec4(SampleRay(origin.xyz, direction.xyz), 1.0));
-    imageStore(accumulation_number, ivec2(gl_LaunchIDEXT.xy),
-               imageLoad(accumulation_number, ivec2(gl_LaunchIDEXT.xy)) + 1.0);
+    total_radiance +=
+        clamp(SampleRay(origin, direction), 0.0, guo.clamp);
   }
+  imageStore(accumulation_color, ivec2(gl_LaunchIDEXT.xy),
+             imageLoad(accumulation_color, ivec2(gl_LaunchIDEXT.xy)) +
+                 vec4(total_radiance, 1.0));
+  imageStore(accumulation_number, ivec2(gl_LaunchIDEXT.xy),
+             imageLoad(accumulation_number, ivec2(gl_LaunchIDEXT.xy)) + float(guo.num_samples));
 }

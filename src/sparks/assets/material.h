@@ -10,13 +10,13 @@ enum MaterialType : int {
   MATERIAL_TYPE_SPECULAR = 1,
   MATERIAL_TYPE_TRANSMISSIVE = 2,
   MATERIAL_TYPE_PRINCIPLED = 3,
-  MATERIAL_TYPE_EMISSION = 4
+  MATERIAL_TYPE_EMISSION = 4,
+  MATERIAL_TYPE_SUBSURFACE = 5
 };
 
 enum MediumType : int {
-  MEDIUM_TYPE_VACUUM = 0,
-  MEDIUM_TYPE_NONSCATTERING = 1,
-  MEDIUM_TYPE_ISOTROPICSCATTERING = 2
+  MEDIUM_TYPE_NONSCATTERING = 0,
+  MEDIUM_TYPE_ISOTROPICSCATTERING = 1
 };
 
 class Scene;
@@ -26,7 +26,7 @@ struct Material {
   int albedo_texture_id{0};
   glm::vec3 emission{0.0f};
   float emission_strength{1.0f};
-  float dis_scattering{0.0001f};
+  float dis_scattering{0.01f};
   float refraction_ratio{1.5f};
   float dis_absorption{1.0};
   float alpha{1.0f};

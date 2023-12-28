@@ -502,9 +502,9 @@ void App::UpdateImGui() {
       ImGui::Separator();
       static int current_item = 0;
       std::vector<const char *> material_types = {
-          "Lambertian", "Specular", "Transmissive", "Principled", "Emission"};
+          "Lambertian", "Specular", "Transmissive", "Principled", "Emission", "Subsurface"};
       std::vector<const char *> medium_types = {
-          "Vacuum", "Nonscattering", "Isotropicscattering"};
+          "Nonscattering", "Isotropicscattering"};
       Material &material = scene.GetEntity(selected_entity_id_).GetMaterial();
       rebuild_objs_ |=
           ImGui::Combo("Type", reinterpret_cast<int *>(&material.material_type),
@@ -530,7 +530,7 @@ void App::UpdateImGui() {
       //     "Absorption Coef", &material.coef_absorption[0],
       //     ImGuiColorEditFlags_PickerHueWheel | ImGuiColorEditFlags_Float);
       rebuild_objs_ |=
-          ImGui::SliderFloat("Scatter Distance", &material.dis_scattering, 0.0001f, 400.0f, "%.4f"); 
+          ImGui::SliderFloat("Scatter Distance", &material.dis_scattering, 0.0001f, 1.0f, "%.4f"); 
       rebuild_objs_ |=
           ImGui::SliderFloat("Absorption Distance", &material.dis_absorption, 0.01f, 400.0f, "%.2f"); 
       rebuild_objs_ |=

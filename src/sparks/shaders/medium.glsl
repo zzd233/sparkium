@@ -30,7 +30,7 @@ vec3 SampleScatterDirection(uint medium_type, vec3 dir, inout float pdf){
 // }
 
 vec3 Transmission(uint medium_type, vec3 coef_absorption, float dis){
-    if(medium_type == MEDIUM_TYPE_VACUUM)
-        return vec3(1.0, 1.0, 1.0);
+    // if(medium_type == MEDIUM_TYPE_VACUUM)
+    //     return vec3(1.0, 1.0, 1.0);
     return vec3(exp(- coef_absorption[0] * dis), exp(- coef_absorption[1] * dis), exp(- coef_absorption[2] * dis));
 }

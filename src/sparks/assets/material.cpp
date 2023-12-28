@@ -13,10 +13,11 @@ std::unordered_map<std::string, MaterialType> material_name_map{
     {"specular", MATERIAL_TYPE_SPECULAR},
     {"transmissive", MATERIAL_TYPE_TRANSMISSIVE},
     {"principled", MATERIAL_TYPE_PRINCIPLED},
-    {"emission", MATERIAL_TYPE_EMISSION}};
+    {"emission", MATERIAL_TYPE_EMISSION},
+    {"subsurface", MATERIAL_TYPE_SUBSURFACE}};
 
 std::unordered_map<std::string, MediumType> medium_name_map{
-    {"vacuum", MEDIUM_TYPE_VACUUM},
+    // {"vacuum", MEDIUM_TYPE_VACUUM},
     {"nonscattering", MEDIUM_TYPE_NONSCATTERING},
     {"isotropicscattering", MEDIUM_TYPE_ISOTROPICSCATTERING}};
 
