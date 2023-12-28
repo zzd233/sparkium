@@ -517,6 +517,9 @@ void App::UpdateImGui() {
       rebuild_objs_ |= ImGui::ColorEdit3(
           "Emission", &material.emission[0],
           ImGuiColorEditFlags_PickerHueWheel | ImGuiColorEditFlags_Float);
+      rebuild_objs_ |= ImGui::ColorEdit3(
+          "Absorption Color", &material.absorption_color[0],
+          ImGuiColorEditFlags_PickerHueWheel | ImGuiColorEditFlags_Float);
       rebuild_objs_ |=
           ImGui::SliderFloat("Emission Strength", &material.emission_strength,
                              0.0f, 1e5f, "%.3f", ImGuiSliderFlags_Logarithmic);

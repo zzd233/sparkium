@@ -184,6 +184,7 @@ vec3 SampleRay(vec3 origin, vec3 direction) {
       }
       if(dis == tFar) lost_in_medium = false;
       else{
+        // throughput *= vec3(0.0, 0.0, 1.0);
         origin = origin + dis * direction;
         direction = SampleScatterDirection(cur_medium_type, direction, lastpdf);
       }
@@ -214,7 +215,7 @@ vec3 SampleRay(vec3 origin, vec3 direction) {
     if (material.material_type == MATERIAL_TYPE_SUBSURFACE) {
       in_medium = !in_medium;
       cur_medium_type = material.medium_type;
-      cur_coef_absorption = -log( vec3(0.909674656, 0.8902986733, 0.8901986733) ) / material.dis_absorption;
+      cur_coef_absorption = -log( material.absorption_color ) / material.dis_absorption;
       cur_coef_scattering = vec3( 1.0 / material.dis_scattering );
 
       if (dot(hit_record.normal, direction) > 0.0f)
@@ -231,9 +232,9 @@ vec3 SampleRay(vec3 origin, vec3 direction) {
       vec3 dir = vec3(sin(r1) * sqrt(1.0 - r2), cos(r1) * sqrt(1.0 - r2), sqrt(r2));
       float pdf = dir.z / PI;
       dir = x * dir.x + y * dir.y + N * dir.z;
-      throughput *= dot(N, normalize(dir)) / PI * hit_record.base_color / pdf;
+      // throughput *= dot(N, normalize(dir)) / PI * hit_record.base_color / pdf;
       origin = hit_record.position;
-      direction = dir;
+      direction = dir - 2.0 * dot(dir, hit_record.normal) * hit_record.normal;
       lastpdf = pdf;
     } else if (material.material_type == MATERIAL_TYPE_EMISSION) {
       mis_ratio = 1;
@@ -348,9 +349,6 @@ vec3 SampleRay(vec3 origin, vec3 direction) {
 }
 
 void main() {
-  const vec2 pixelCenter = vec2(gl_LaunchIDEXT.xy) + vec2(0.5);
-  const vec2 inUV = pixelCenter / vec2(gl_LaunchSizeEXT.xy);
-  vec2 d = inUV * 2.0 - 1.0;
 
   mat4 camera_to_world = inverse(guo.camera);
   mat4 screen_to_camera = inverse(guo.projection);
@@ -358,6 +356,9 @@ void main() {
   vec3 total_radiance = vec3(0.0);
 
   for (int i = 0; i < guo.num_samples; i++) {
+    const vec2 pixelCenter = vec2(gl_LaunchIDEXT.xy) + vec2(RandomFloat(), RandomFloat());
+    const vec2 inUV = pixelCenter / vec2(gl_LaunchSizeEXT.xy);
+    vec2 d = inUV * 2.0 - 1.0;
     InitRandomSeed(uint(pixelCenter.x), uint(pixelCenter.y),
                    guo.accumulated_sample + i);
     // vec4 origin = camera_to_world * vec4(0, 0, 0, 1);

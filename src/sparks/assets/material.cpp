@@ -51,6 +51,11 @@ Material::Material(Scene *scene, const tinyxml2::XMLElement *material_element)
     emission = StringToVec3(child_element->FindAttribute("value")->Value());
   }
 
+  child_element = material_element->FirstChildElement("absorption_color");
+  if (child_element) {
+    absorption_color = StringToVec3(child_element->FindAttribute("value")->Value());
+  }
+
   child_element = material_element->FirstChildElement("emission_strength");
   if (child_element) {
     emission_strength =

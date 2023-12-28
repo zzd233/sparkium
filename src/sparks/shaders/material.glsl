@@ -11,7 +11,9 @@ struct Material {
   uint material_type;
   float metallization;
   uint medium_type;
-  uint uesless_1;
+  uint useless_1;
+  vec3 absorption_color;
+  uint useless_2;
 };
 
 #define MEDIUM_TYPE_VACUUM 0
