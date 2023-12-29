@@ -75,7 +75,7 @@ void TraceRay(vec3 origin, vec3 direction) {
 }
 
 void SampleLight(vec3 O, vec3 N, out vec3 dir, out vec3 eval, out float pdf) {
-  int n_ls = light_source_object_infos.length();
+  int n_ls = light_source_object_infos.length() - 1;
   if (n_ls == 0) {
     eval = vec3(0);
     pdf = 0;
@@ -243,7 +243,7 @@ vec3 SampleRay(vec3 origin, vec3 direction) {
       mis_ratio = 1;
       if (guo.enable_mis && b > 0) {
         float pdf;
-        int n_ls = light_source_object_infos.length();
+        int n_ls = light_source_object_infos.length() - 1;
         ObjectInfo obj = object_infos[ray_payload.object_id];
         int n_meshes = int(obj.n_meshes);
         int mesh_id = int(ray_payload.primitive_id);

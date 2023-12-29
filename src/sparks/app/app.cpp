@@ -790,6 +790,7 @@ void App::UpdateDeviceAssets() {
         std::make_unique<vulkan::framework::StaticBuffer<ObjectInfo>>(
             core_.get(), object_info_data_.size());
     object_info_buffer_->Upload(object_info_data_.data());
+    light_source_object_info_data_.push_back(0);
     light_source_object_info_buffer_ =
         std::make_unique<vulkan::framework::StaticBuffer<uint32_t>>(
             core_.get(), light_source_object_info_data_.size());
