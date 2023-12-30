@@ -45,6 +45,15 @@ Material::Material(Scene *scene, const tinyxml2::XMLElement *material_element)
           scene->AddTexture(albedo_texture, PathToFilename(path));
     }
   }
+  
+  child_element = material_element->FirstChildElement("normal_map");
+  if (child_element) {
+    std::string path = child_element->FindAttribute("value")->Value();
+    Texture normal_map(1, 1);
+    if (Texture::Load(path, normal_map)) {
+      normal_map_id = scene->AddTexture(normal_map, PathToFilename(path));
+    }
+  }
 
   child_element = material_element->FirstChildElement("emission");
   if (child_element) {
@@ -85,11 +94,6 @@ Material::Material(Scene *scene, const tinyxml2::XMLElement *material_element)
   child_element = material_element->FirstChildElement("dis_absorption");
   if (child_element) {
     dis_absorption = std::stof(child_element->FindAttribute("value")->Value());
-  }
-
-  child_element = material_element->FirstChildElement("useless_1");
-  if (child_element) {
-    useless_1 = std::stof(child_element->FindAttribute("value")->Value());
   }
 
   material_type =

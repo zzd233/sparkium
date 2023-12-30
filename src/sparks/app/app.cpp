@@ -514,6 +514,29 @@ void App::UpdateImGui() {
           ImGuiColorEditFlags_PickerHueWheel | ImGuiColorEditFlags_Float);
       rebuild_objs_ |=
           scene.TextureCombo("Albedo Texture", &material.albedo_texture_id);
+      rebuild_objs_ |=
+          scene.TextureCombo("Normal Map", &material.normal_map_id);
+          
+      if (material.normal_map_id != -1) {
+        rebuild_objs_ |= ImGui::SliderFloat(
+            "Normal Intensity", &material.normal_map_intensity, 0.0f, 10.0f);
+        bool reverse_bitangent = false;
+        if (material.normal_map_id < 0) {
+          reverse_bitangent = true;
+        }
+        rebuild_objs_ |=
+            ImGui::Checkbox("Reverse Bitangent", &reverse_bitangent);
+        if (reverse_bitangent) {
+          material.normal_map_id |= 0x80000000;
+        } else {
+          material.normal_map_id &= 0x7fffffff;
+        }
+
+        if (ImGui::Button("Remove Normal Map")) {
+          material.normal_map_id = -1;
+          rebuild_objs_ = true;
+        }
+      }
       rebuild_objs_ |= ImGui::ColorEdit3(
           "Emission", &material.emission[0],
           ImGuiColorEditFlags_PickerHueWheel | ImGuiColorEditFlags_Float);

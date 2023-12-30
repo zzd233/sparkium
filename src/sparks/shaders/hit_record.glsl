@@ -1,9 +1,22 @@
+#ifndef HIT_RECORD_GLSL
+#define HIT_RECORD_GLSL
+
+#include "material.glsl"
+#include "vertex.glsl"
+
+vec4 SampleTexture(int texture_id, vec2 tex_coord) {
+  return texture(texture_samplers[texture_id],
+                 tex_coord * vec2(1, -1) + vec2(0, 1));
+}
+
 struct HitRecord {
   int hit_entity_id;
   vec3 position;
   vec3 normal;
+  vec3 shading_normal;
   vec3 geometry_normal;
   vec3 tangent;
+  vec3 bitangent;
   vec2 tex_coord;
   bool front_face;
 
@@ -26,6 +39,9 @@ HitRecord GetHitRecord(RayPayload ray_payload, vec3 origin, vec3 direction) {
   Vertex v2 = GetVertex(
       object_info.vertex_offset +
       indices[object_info.index_offset + ray_payload.primitive_id * 3 + 2]);
+  vec3 b0 = cross(v0.normal, v0.tangent);
+  vec3 b1 = cross(v1.normal, v1.tangent);
+  vec3 b2 = cross(v2.normal, v2.tangent);
   hit_record.hit_entity_id = int(ray_payload.object_id);
 
   mat3 object_to_world = mat3(ray_payload.object_to_world);
@@ -34,7 +50,7 @@ HitRecord GetHitRecord(RayPayload ray_payload, vec3 origin, vec3 direction) {
                                  ray_payload.barycentric,
                              1.0);
 
-  hit_record.normal = normalize(transpose(inverse(object_to_world)) *
+  hit_record.shading_normal = normalize(transpose(inverse(object_to_world)) *
                                 mat3(v0.normal, v1.normal, v2.normal) *
                                 ray_payload.barycentric);
   hit_record.geometry_normal =
@@ -43,20 +59,40 @@ HitRecord GetHitRecord(RayPayload ray_payload, vec3 origin, vec3 direction) {
   hit_record.tangent =
       normalize(object_to_world * mat3(v0.tangent, v1.tangent, v2.tangent) *
                 ray_payload.barycentric);
+  hit_record.bitangent =
+      normalize(object_to_world * mat3(b0, b1, b2) * ray_payload.barycentric);
   hit_record.tex_coord = mat3x2(v0.tex_coord, v1.tex_coord, v2.tex_coord) *
                          ray_payload.barycentric;
+
+  if (dot(hit_record.geometry_normal, hit_record.shading_normal) < 0.0) {
+    hit_record.geometry_normal = -hit_record.geometry_normal;
+  }
 
   Material mat = materials[hit_record.hit_entity_id];
   hit_record.base_color =
       mat.albedo_color *
-      texture(texture_samplers[mat.albedo_texture_id], hit_record.tex_coord)
-          .xyz;
+      SampleTexture(mat.albedo_texture_id, hit_record.tex_coord).xyz;
   hit_record.emission = mat.emission;
   hit_record.emission_strength = mat.emission_strength;
   hit_record.alpha = mat.alpha;
   hit_record.material_type = mat.material_type;
 
-  if (dot(hit_record.geometry_normal, hit_record.normal) < 0.0) {
+  vec3 relative_normal = vec3(0, 0, 1);
+  float bitagent_signal = 1.0;
+  if (mat.normal_map_id != -1) {
+    // if (mat.normal_map_id < 0) {
+    //   bitagent_signal = -1.0;
+    // }
+    // mat.normal_map_id &= 0x3fffffff;
+    // relative_normal = (SampleTexture(mat.normal_map_id, hit_record.tex_coord).xyz - 0.5) * 2;
+    // relative_normal = vec3(
+    //     relative_normal.xy * mat.normal_map_intensity / relative_normal.z, 1.0);
+    // relative_normal = normalize(relative_normal);
+  }
+  hit_record.normal =
+      mat3(hit_record.tangent, bitagent_signal * hit_record.bitangent,
+           hit_record.shading_normal) * relative_normal;
+  if (dot(hit_record.geometry_normal, hit_record.shading_normal) < 0.0) {
     hit_record.geometry_normal = -hit_record.geometry_normal;
   }
 
@@ -64,9 +100,13 @@ HitRecord GetHitRecord(RayPayload ray_payload, vec3 origin, vec3 direction) {
   if (dot(direction, hit_record.geometry_normal) > 0.0) {
     hit_record.front_face = false;
     hit_record.geometry_normal = -hit_record.geometry_normal;
+    hit_record.shading_normal = -hit_record.shading_normal;
     hit_record.normal = -hit_record.normal;
     hit_record.tangent = -hit_record.tangent;
+    hit_record.bitangent = -hit_record.bitangent;
   }
 
   return hit_record;
 }
+
+#endif

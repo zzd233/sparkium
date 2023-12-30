@@ -33,9 +33,9 @@ struct Material {
   MaterialType material_type{MATERIAL_TYPE_LAMBERTIAN};
   float metallization{0.8};
   MediumType medium_type{MEDIUM_TYPE_NONSCATTERING};
-  int useless_1{0};
+  int normal_map_id{-1};
   glm::vec3 absorption_color{glm::vec3(0.7, 0.7, 1.000)};
-  int useless_2{0};
+  float normal_map_intensity{1.0f};
   Material() = default;
   explicit Material(const glm::vec3 &albedo);
   Material(Scene *scene, const tinyxml2::XMLElement *material_element);

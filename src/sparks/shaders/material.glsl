@@ -1,4 +1,7 @@
 
+#ifndef MATERIAL_GLSL
+#define MATERIAL_GLSL
+
 struct Material {
   vec3 albedo_color;
   int albedo_texture_id;
@@ -11,9 +14,9 @@ struct Material {
   uint material_type;
   float metallization;
   uint medium_type;
-  uint useless_1;
+  int normal_map_id;
   vec3 absorption_color;
-  uint useless_2;
+  float normal_map_intensity;
 };
 
 #define MEDIUM_TYPE_NONSCATTERING 0
@@ -25,3 +28,5 @@ struct Material {
 #define MATERIAL_TYPE_PRINCIPLED 3
 #define MATERIAL_TYPE_EMISSION 4
 #define MATERIAL_TYPE_SUBSURFACE 5
+
+#endif
