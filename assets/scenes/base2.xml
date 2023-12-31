@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<scene>
+	<camera>
+		<transform type="lookat">
+			<eye value="2.0 1.0 3.0"/>
+			<center value="0.0 0.0 0.0"/>
+			<up value="0.0 1.0 0.0"/>
+		</transform>
+	</camera>
+
+	<envmap type="file" value="../../textures/envmap_clouds_4k.hdr"/>
+
+	<model type="obj">
+		<filename value="../../meshes/piano.obj"/>
+		<transform type="world">
+            <scale value="0.001 0.001 0.001"/>
+        </transform>
+
+
+		<material type="lambertian">
+			<albedo value="0.8 0.8 0.8"/>
+		</material>
+	</model>
+
+
+	<!-- <model type="obj">
+		<filename value="../../meshes/uploads_files_968163_Globe_unposed.obj"/>
+
+
+		<material type="lambertian">
+			<albedo_texture value="../../textures/Globe_Mat_BaseColor.png"/>
+		</material>
+	</model> -->
+
+</scene>
