@@ -39,9 +39,9 @@ HitRecord GetHitRecord(RayPayload ray_payload, vec3 origin, vec3 direction) {
   Vertex v2 = GetVertex(
       object_info.vertex_offset +
       indices[object_info.index_offset + ray_payload.primitive_id * 3 + 2]);
-  vec3 b0 = cross(v0.normal, v0.tangent);
-  vec3 b1 = cross(v1.normal, v1.tangent);
-  vec3 b2 = cross(v2.normal, v2.tangent);
+  vec3 b0 = v0.signal * cross(v0.normal, v0.tangent);
+  vec3 b1 = v1.signal * cross(v1.normal, v1.tangent);
+  vec3 b2 = v2.signal * cross(v2.normal, v2.tangent);
   hit_record.hit_entity_id = int(ray_payload.object_id);
 
   mat3 object_to_world = mat3(ray_payload.object_to_world);
@@ -80,14 +80,14 @@ HitRecord GetHitRecord(RayPayload ray_payload, vec3 origin, vec3 direction) {
   vec3 relative_normal = vec3(0, 0, 1);
   float bitagent_signal = 1.0;
   if (mat.normal_map_id != -1) {
-    // if (mat.normal_map_id < 0) {
-    //   bitagent_signal = -1.0;
-    // }
-    // mat.normal_map_id &= 0x3fffffff;
-    // relative_normal = (SampleTexture(mat.normal_map_id, hit_record.tex_coord).xyz - 0.5) * 2;
-    // relative_normal = vec3(
-    //     relative_normal.xy * mat.normal_map_intensity / relative_normal.z, 1.0);
-    // relative_normal = normalize(relative_normal);
+    if (mat.normal_map_id < 0) {
+      bitagent_signal = -1.0;
+    }
+    mat.normal_map_id &= 0x3fffffff;
+    relative_normal = (SampleTexture(mat.normal_map_id, hit_record.tex_coord).xyz - 0.5) * 2;
+    relative_normal = vec3(
+        relative_normal.xy * mat.normal_map_intensity / relative_normal.z, 1.0);
+    relative_normal = normalize(relative_normal);
   }
   hit_record.normal =
       mat3(hit_record.tangent, bitagent_signal * hit_record.bitangent,
