@@ -905,7 +905,7 @@ void App::RebuildRenderNode() {
           VK_BLEND_OP_ADD, VK_COLOR_COMPONENT_R_BIT});
   preview_render_node_->VertexInput(
       {VK_FORMAT_R32G32B32_SFLOAT, VK_FORMAT_R32G32B32_SFLOAT,
-       VK_FORMAT_R32G32B32_SFLOAT, VK_FORMAT_R32G32_SFLOAT});
+       VK_FORMAT_R32G32B32_SFLOAT, VK_FORMAT_R32G32B32_SFLOAT});
   preview_render_node_->BuildRenderNode(core_->GetFramebufferWidth(),
                                         core_->GetFramebufferHeight());
 
@@ -936,7 +936,7 @@ void App::RebuildRenderNode() {
           VK_BLEND_OP_ADD, VK_COLOR_COMPONENT_R_BIT});
   preview_render_node_far_->VertexInput(
       {VK_FORMAT_R32G32B32_SFLOAT, VK_FORMAT_R32G32B32_SFLOAT,
-       VK_FORMAT_R32G32B32_SFLOAT, VK_FORMAT_R32G32_SFLOAT});
+       VK_FORMAT_R32G32B32_SFLOAT, VK_FORMAT_R32G32B32_SFLOAT});
   preview_render_node_far_->BuildRenderNode(core_->GetFramebufferWidth(),
                                             core_->GetFramebufferHeight());
 
