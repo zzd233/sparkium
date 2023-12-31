@@ -218,7 +218,7 @@ vec3 SampleRay(vec3 origin, vec3 direction) {
       if(in_medium){
         cur_medium_type = material.medium_type;
         cur_coef_absorption = -log( material.absorption_color ) / material.dis_absorption;
-        cur_coef_scattering = vec3( 1.0 / material.dis_scattering );
+        cur_coef_scattering = vec3( material.albedo_color / material.dis_scattering );
       }
 
       if (dot(hit_record.normal, direction) > 0.0f)

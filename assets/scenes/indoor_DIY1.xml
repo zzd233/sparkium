@@ -2,13 +2,15 @@
 <scene>
     <camera>
         <transform type="lookat">
-            <eye value="0 25 1"/>
-            <center value="0 25 100"/>
+            <eye value="0 35 1"/>
+            <center value="0 35 100"/>
             <up value="0.0 1.0 0.0"/>
         </transform>
         <fov value="40"/>
         <speed value="100"/>
     </camera>
+
+	<envmap type="file" value="../../textures/lilienstein_4k.hdr"/>
 
     <!--Out Light-->
     <!-- <model name="OutLight">
@@ -161,7 +163,8 @@
         <index value="2"/>
 
         <material type="lambertian">
-            <albedo value="0.85 0.85 1.0"/>
+            <!-- <albedo value="1.0 1.0 1.0"/> -->
+            <albedo value="1.0 0.8 0.8"/>
         </material>
     </model>
 
@@ -179,11 +182,36 @@
         <index value="2"/>
 
         <material type="lambertian">
-            <albedo value="0.85 0.85 1.0"/>
+            <albedo value="0.8 1.0 0.8"/>
 			<!-- <albedo_texture value="../../textures/stonetile1.jpg"/> -->
         </material>
     </model>
 
+    <!-- Mirror-->
+    <!-- <model type="sphere" name="mirror1">
+		<center value="60 50 305"/>
+		<radius value="20"/>
+		<transform type="translate" value="0.0 0.5 0.0"/>
+		<material type="specular">
+			<albedo value="1 1 1"/>
+		</material>
+	</model> -->
+    <model type="sphere" name="mirror2">
+		<center value="0 50 305"/>
+		<radius value="20"/>
+		<transform type="translate" value="0.0 0.5 0.0"/>
+		<material type="specular">
+			<albedo value="1 1 1"/>
+		</material>
+	</model>
+    <!-- <model type="sphere" name="mirror3">
+		<center value="-60 50 305"/>
+		<radius value="20"/>
+		<transform type="translate" value="0.0 0.5 0.0"/>
+		<material type="specular">
+			<albedo value="1 1 1"/>
+		</material>
+	</model> -->
 
     <!--Table-->
     <model name="table" type="obj">
@@ -213,7 +241,7 @@
 
 		<material type="lambertian">
 			<albedo_texture value="../../textures/Globe_Mat_BaseColor.png"/>
-			<normal_map value="../../textures/Globe_Mat_Normal_DirectX.png"/>
+			<normal_map value="../../textures/Globe_Mat_Normal_OpenGL.png"/>
 		</material>
 	</model>
 
@@ -236,13 +264,13 @@
     <model type="obj" name="Bunny">
         <filename value="../../meshes/bunny.obj"/>
         <transform type="world">
-            <scale value="40 40 40"/>
-            <translation value="-10 20.2 50"/>
+            <scale value="50 50 50"/>
+            <translation value="-10 20.0 50"/>
             <rotation value="-174 52 -180"/>
         </transform>
 
         <material type="subsurface">
-            <albedo value="1 1 1"/>
+            <albedo value="1 0.9 0.9"/>
         </material>
     </model>
 

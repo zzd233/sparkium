@@ -8,27 +8,29 @@
 		</transform>
 	</camera>
 
-	<envmap type="file" value="../../textures/envmap_clouds_4k.hdr"/>
+	<envmap type="file" value="../../textures/qwantani_puresky_8k.hdr"/>
 
 	<model type="obj">
-		<filename value="../../meshes/piano.obj"/>
-		<transform type="world">
+		<filename value="../../meshes/SciFi_Fighter_AK5.obj"/>
+        
+        <transform type="world">
             <scale value="0.001 0.001 0.001"/>
+            <translation value="0 0 0"/>
+            <rotation value="0 75 0"/>
         </transform>
 
-
 		<material type="lambertian">
-			<albedo value="0.8 0.8 0.8"/>
+			<albedo value="1.0 1.0 1.0"/>
+			<albedo_texture value="../../textures/SciFi_Fighter_AK5-diffuse.jpg"/>
+			<normal_map value="../../textures/SciFi_Fighter_AK5-Normal_Map.jpg"/>
 		</material>
 	</model>
-
 
 	<!-- <model type="obj">
 		<filename value="../../meshes/uploads_files_968163_Globe_unposed.obj"/>
 
 
 		<material type="lambertian">
-			<albedo_texture value="../../textures/Globe_Mat_BaseColor.png"/>
 		</material>
 	</model> -->
 

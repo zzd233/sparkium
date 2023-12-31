@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="utf-8"?>
+<scene>
+    <camera>
+        <transform type="lookat">
+            <eye value="0 25 1"/>
+            <center value="0 25 100"/>
+            <up value="0.0 1.0 0.0"/>
+        </transform>
+        <fov value="40"/>
+        <speed value="100"/>
+    </camera>
+
+	<envmap type="file" value="../../textures/lilienstein_4k.hdr"/>
+
+    <!--Out Light-->
+    <!-- <model name="OutLight">
+        <vertex position="120.0 60.0 10.0"/>
+        <vertex position="120.0 120.0 10.0"/>
+        <vertex position="120.0 120.0 400.0"/>
+        <vertex position="120.0 60.0 400.0"/>
+        <index value="0"/>
+        <index value="1"/>
+        <index value="3"/>
+        <index value="3"/>
+        <index value="1"/>
+        <index value="2"/>
+
+        <material type="emission">
+            <emission value="1.0 1.0 0.5"/>
+            <emission_strength value="5.0"/>
+        </material>
+    </model> -->
+
+    
+    <!--In Light-->
+    <!-- <model name="InLight" type="sphere">
+        <center value="50.0 95.0 100.0"/>
+		<radius value="5.0"/>
+
+        <material type="emission">
+            <emission value="1.0 1.0 1.0"/>
+            <emission_strength value="40.0"/>
+        </material>
+    </model> -->
+
+    <model name="Light">
+        <vertex position="-30.0 100 120.0"/>
+        <vertex position="30.0 100 120.0"/>
+        <vertex position="30.0 100 180.0"/>
+        <vertex position="-30.0 100 180.0"/>
+        <index value="0"/>
+        <index value="1"/>
+        <index value="3"/>
+        <index value="3"/>
+        <index value="1"/>
+        <index value="2"/>
+
+        <material type="emission">
+            <emission value="1.0 1.0 1.0"/>
+            <emission_strength value="10.0"/>
+        </material>
+    </model>
+
+	<model name="Floor_Plain"type="obj">
+		<filename value="../../meshes/plane.obj"/>
+
+        
+        <transform type="world">
+            <scale value="150 150 150"/>
+            <translation value="0 0 150"/>
+            <rotation value="0 0 0"/>
+        </transform>
+		<material type="lambertian">
+			<albedo value="1.0 1.0 1.0"/>
+            <albedo_texture value="../../textures/wooden-wall-scratched-material-background-texture-concept.jpg"/>
+		</material>
+	</model>
+
+    <!--floor-->
+    <!-- <model name="Floor">
+        <vertex position="-100.0 0.0   0.0"/>
+        <vertex position="100.0 0.0   0.0"/>
+        <vertex position="100.0 0.0 300.0"/>
+        <vertex position="-100.0 0.0 300.0"/>
+        <index value="0"/>
+        <index value="1"/>
+        <index value="3"/>
+        <index value="3"/>
+        <index value="1"/>
+        <index value="2"/>
+
+        <material type="lambertian">
+            <albedo value="0.9 0.9 0.9"/>
+        </material>
+    </model> -->
+
+    <!--ceiling-->
+    <model name="Ceiling">
+        <vertex position="-100.0 100.0   0.0"/>
+        <vertex position="100.0 100.0   0.0"/>
+        <vertex position="100.0 100.0 300.0"/>
+        <vertex position="-100.0 100.0 300.0"/>
+        <index value="0"/>
+        <index value="1"/>
+        <index value="3"/>
+        <index value="3"/>
+        <index value="1"/>
+        <index value="2"/>
+
+        <material type="lambertian">
+            <albedo value="0.85 0.85 1.0"/>
+        </material>
+    </model>
+
+    <!--front wall-->
+    <model name="Front Wall">
+        <vertex position="-100.0 0.0 0.0"/>
+        <vertex position="-100.0 100.0 0.0"/>
+        <vertex position="100.0 100.0 0.0"/>
+        <vertex position="100.0 0.0 0.0"/>
+        <index value="0"/>
+        <index value="1"/>
+        <index value="3"/>
+        <index value="3"/>
+        <index value="1"/>
+        <index value="2"/>
+
+        <material type="lambertian">
+            <albedo value="0.85 0.85 1.0"/>
+        </material>
+    </model>
+
+    <!--back wall-->
+    <model name="Back Wall">
+        <vertex position="-100.0 0.0 300.0"/>
+        <vertex position="-100.0 100.0 300.0"/>
+        <vertex position="100.0 100.0 300.0"/>
+        <vertex position="100.0 0.0 300.0"/>
+        <index value="0"/>
+        <index value="1"/>
+        <index value="3"/>
+        <index value="3"/>
+        <index value="1"/>
+        <index value="2"/>
+
+        <material type="lambertian">
+            <albedo value="0.85 0.85 1.0"/>
+			<!-- <albedo_texture value="../../textures/stonetile1.jpg"/> -->
+        </material>
+    </model>
+
+    <!--Left wall-->
+    <model name="Left Wall">
+        <vertex position="100.0  0.0   0.0 "/>
+        <vertex position="100.0  100.0 0.0"/>
+        <vertex position="100.0 100.0 300.0"/>
+        <vertex position="100.0 0.0 300.0"/>
+        <index value="0"/>
+        <index value="1"/>
+        <index value="3"/>
+        <index value="3"/>
+        <index value="1"/>
+        <index value="2"/>
+
+        <material type="specular">
+            <albedo value="1.0 1.0 1.0"/>
+            <!-- <albedo value="0.85 0.85 1.0"/> -->
+        </material>
+    </model>
+
+    <!--Right wall-->
+    <model name="Right Wall">
+        <vertex position="-100.0  0.0   0.0 "/>
+        <vertex position="-100.0  100.0 0.0"/>
+        <vertex position="-100.0 100.0 300.0"/>
+        <vertex position="-100.0 0.0 300.0"/>
+        <index value="0"/>
+        <index value="1"/>
+        <index value="3"/>
+        <index value="3"/>
+        <index value="1"/>
+        <index value="2"/>
+
+        <material type="lambertian">
+            <albedo value="0.85 0.85 1.0"/>
+			<!-- <albedo_texture value="../../textures/stonetile1.jpg"/> -->
+        </material>
+    </model>
+
+
+    <!--Table-->
+    <model name="table" type="obj">
+		<filename value="../../meshes/table.obj"/>
+        
+        <transform type="world">
+            <scale value="40 30 50"/>
+            <translation value="0 0 60"/>
+            <rotation value="0 75 0"/>
+        </transform>
+		<material type="lambertian">
+			<albedo value="1 1 1"/>
+			<albedo_texture value="../../textures/abciuppa_w.jpg"/>
+            
+		</material>
+	</model>
+
+    <!--Globe-->
+    <model name="globe" type="obj">
+		<filename value="../../meshes/Globe_posed.obj"/>
+        
+        <transform type="world">
+            <scale value="80 80 80"/>
+            <translation value="30 0 130"/>
+            <rotation value="0 0 0"/>
+        </transform>
+
+		<material type="lambertian">
+			<albedo_texture value="../../textures/Globe_Mat_BaseColor.png"/>
+			<normal_map value="../../textures/Globe_Mat_Normal_DirectX.png"/>
+		</material>
+	</model>
+
+    <!-- glass-->
+    <model name="glass" type="obj">
+		<filename value="../../meshes/many_glass.obj"/>
+        
+        <transform type="world">
+            <scale value="0.01 0.01 0.01"/>
+            <translation value="5 21.40 50"/>
+            <rotation value="0 0 0"/>
+        </transform>
+
+		<material type="transmissive">
+			<albedo value="0.4 1 0.4"/>
+		</material>
+	</model>
+
+    <!--bunny-->
+    <model type="obj" name="Bunny">
+        <filename value="../../meshes/bunny.obj"/>
+        <transform type="world">
+            <scale value="40 40 40"/>
+            <translation value="-10 20.2 50"/>
+            <rotation value="-174 52 -180"/>
+        </transform>
+
+        <material type="subsurface">
+            <albedo value="1 1 1"/>
+        </material>
+    </model>
+
+    <model type="obj" name="piano">
+        <filename value="../../meshes/piano.obj"/>
+        <transform type="world">
+            <scale value="0.05 0.05 0.05"/>
+            <translation value="-24 0 180"/>
+            <rotation value="-180.0 60 -180.0"/>
+        </transform>
+
+        <material type="lambertian">
+            <albedo value="0.2 0.2 0.2"/>
+        </material>
+    </model>
+</scene>
