@@ -241,7 +241,7 @@
 
 		<material type="lambertian">
 			<albedo_texture value="../../textures/Globe_Mat_BaseColor.png"/>
-			<normal_map value="../../textures/Globe_Mat_Normal_OpenGL.png"/>
+			<!-- <normal_map value="../../textures/Globe_Mat_Normal_OpenGL.png"/> -->
 		</material>
 	</model>
 

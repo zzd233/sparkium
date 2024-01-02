@@ -560,7 +560,7 @@ void App::UpdateImGui() {
       rebuild_objs_ |=
           ImGui::SliderFloat("Absorption Distance", &material.dis_absorption, 0.01f, 40.0f, "%.2f"); 
       rebuild_objs_ |=
-          ImGui::SliderFloat("Refraction Ratio", &material.refraction_ratio, 0.0f, 1.0f, "%.2f"); 
+          ImGui::SliderFloat("Refraction Ratio", &material.refraction_ratio, 0.0f, 3.0f, "%.2f"); 
       rebuild_objs_ |=
           ImGui::SliderFloat("Alpha", &material.alpha, 0.0f, 1.0f, "%.3f");
       rebuild_objs_ |=

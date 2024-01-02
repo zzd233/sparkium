@@ -27,7 +27,7 @@ struct Material {
   glm::vec3 emission{0.0f};
   float emission_strength{1.0f};
   float dis_scattering{0.1001f};
-  float refraction_ratio{1.9f};
+  float refraction_ratio{1.2f};
   float dis_absorption{0.37};
   float alpha{1.0f};
   MaterialType material_type{MATERIAL_TYPE_LAMBERTIAN};
