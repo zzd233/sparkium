@@ -234,8 +234,8 @@
 		<filename value="../../meshes/Globe_posed.obj"/>
         
         <transform type="world">
-            <scale value="80 80 80"/>
-            <translation value="30 0 130"/>
+            <scale value="100 100 100"/>
+            <translation value="40 0 130"/>
             <rotation value="0 0 0"/>
         </transform>
 
@@ -274,7 +274,7 @@
         </material>
     </model>
 
-    <model type="obj" name="piano">
+    <!-- <model type="obj" name="piano">
         <filename value="../../meshes/piano.obj"/>
         <transform type="world">
             <scale value="0.05 0.05 0.05"/>
@@ -285,5 +285,133 @@
         <material type="lambertian">
             <albedo value="0.2 0.2 0.2"/>
         </material>
+    </model> -->
+    
+
+    <model type="obj" name="piano1">
+        <filename value="../../meshes/Piano_part_1.obj"/>
+        <transform type="world">
+            <scale value="0.7 0.7 0.7"/>
+            <translation value="-40 35 180"/>
+            <rotation value="-180.0 60 -180.0"/>
+        </transform>
+
+        <material type="lambertian">
+            <!-- <albedo value="0.2 0.2 0.2"/> -->
+			<albedo_texture value="../../textures/1.png"/>
+        </material>
     </model>
+
+    <model type="obj" name="piano2">
+        <filename value="../../meshes/Piano_part_2.obj"/>
+        <transform type="world">
+            <scale value="0.7 0.7 0.7"/>
+            <translation value="-40 35 180"/>
+            <rotation value="-180.0 60 -180.0"/>
+        </transform>
+
+        <material type="lambertian">
+            <!-- <albedo value="0.2 0.2 0.2"/> -->
+			<albedo_texture value="../../textures/2.png"/>
+        </material>
+    </model>
+
+    <model type="obj" name="piano3">
+        <filename value="../../meshes/Piano_part_3.obj"/>
+        <transform type="world">
+            <scale value="0.7 0.7 0.7"/>
+            <translation value="-40 35 180"/>
+            <rotation value="-180.0 60 -180.0"/>
+        </transform>
+
+        <material type="lambertian">
+            <!-- <albedo value="0.2 0.2 0.2"/> -->
+			<albedo_texture value="../../textures/3.png"/>
+        </material>
+    </model>
+
+    <model type="obj" name="piano4">
+        <filename value="../../meshes/Piano_part_4.obj"/>
+        <transform type="world">
+            <scale value="0.7 0.7 0.7"/>
+            <translation value="-40 35 180"/>
+            <rotation value="-180.0 60 -180.0"/>
+        </transform>
+
+        <material type="lambertian">
+            <!-- <albedo value="0.2 0.2 0.2"/> -->
+			<albedo_texture value="../../textures/4.png"/>
+        </material>
+    </model>
+
+    <model type="obj" name="piano5">
+        <filename value="../../meshes/Piano_part_5.obj"/>
+        <transform type="world">
+            <scale value="0.7 0.7 0.7"/>
+            <translation value="-40 35 180"/>
+            <rotation value="-180.0 60 -180.0"/>
+        </transform>
+
+        <material type="lambertian">
+            <!-- <albedo value="0.2 0.2 0.2"/> -->
+			<albedo_texture value="../../textures/5.png"/>
+        </material>
+    </model>
+
+    <model type="obj" name="piano6">
+        <filename value="../../meshes/Piano_part_6.obj"/>
+        <transform type="world">
+            <scale value="0.7 0.7 0.7"/>
+            <translation value="-40 35 180"/>
+            <rotation value="-180.0 60 -180.0"/>
+        </transform>
+
+        <material type="lambertian">
+            <!-- <albedo value="0.2 0.2 0.2"/> -->
+			<albedo_texture value="../../textures/6.png"/>
+        </material>
+    </model>
+
+    <model type="obj" name="piano8">
+        <filename value="../../meshes/Piano_part_8.obj"/>
+        <transform type="world">
+            <scale value="0.7 0.7 0.7"/>
+            <translation value="-40 35 180"/>
+            <rotation value="-180.0 60 -180.0"/>
+        </transform>
+
+        <material type="lambertian">
+            <!-- <albedo value="0.2 0.2 0.2"/> -->
+			<albedo_texture value="../../textures/8.png"/>
+        </material>
+    </model>
+
+    <model type="obj" name="piano9">
+        <filename value="../../meshes/Piano_part_9.obj"/>
+        <transform type="world">
+            <scale value="0.7 0.7 0.7"/>
+            <translation value="-40 35 180"/>
+            <rotation value="-180.0 60 -180.0"/>
+        </transform>
+
+        <material type="lambertian">
+            <!-- <albedo value="0.2 0.2 0.2"/> -->
+			<albedo_texture value="../../textures/9.png"/>
+        </material>
+    </model>
+
+    <model type="obj" name="piano10">
+        <filename value="../../meshes/Piano_part_10.obj"/>
+        <transform type="world">
+            <scale value="0.7 0.7 0.7"/>
+            <translation value="-40 35 180"/>
+            <rotation value="-180.0 60 -180.0"/>
+        </transform>
+
+        <material type="lambertian">
+            <!-- <albedo value="0.2 0.2 0.2"/> -->
+			<albedo_texture value="../../textures/10.png"/>
+        </material>
+    </model>
+
 </scene>
